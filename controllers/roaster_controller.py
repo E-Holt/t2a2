@@ -40,38 +40,20 @@ def register_roaster():
 
     return {"username": roaster.username, "token": token}
 
-# #Login a roaster that is already in the system
-# @roaster.route("/login",methods = ["POST"])
-# def login_roaster():
-#     # Get username and password from the request
-#     roaster_fields = roaster_schema.load(request.json)
-#     # Check username and password. Roaster needs to exist, and password must match
-#     roaster = Roaster.query.filter_by(username=roaster_fields["username"]).first()
-#     if not roaster:
-#         return {"error": "That username is not valid"}
+#Login a roaster that is already in the system
+@roaster.route("/login",methods = ["POST"])
+def login_roaster():
+    # Get username and password from the request
+    roaster_fields = roaster_schema.load(request.json)
+    # Check username and password. Roaster needs to exist, and password must match
+    roaster = Roaster.query.filter_by(username=roaster_fields["username"]).first()
+    if not roaster:
+        return {"error": "That username is not valid"}
     
-#     if not bcrypt.check_password_hash(roaster.password, roaster_fields["password"]):
-#         return {"error": "wrong password"}
+    if not bcrypt.check_password_hash(roaster.password, roaster_fields["password"]):
+        return {"error": "wrong password"}
 
-#     # Credentials are valid, so generate token and return it to the roster
-#     token = create_access_token(identity=str(roaster.roaster_id), expires_delta=timedelta(days=1)) 
+    # Credentials are valid, so generate token and return it to the roster
+    token = create_access_token(identity=str(roaster.roaster_id), expires_delta=timedelta(days=1)) 
 
-#     return {"username": roaster.username, "token": token}
-
-# #Login roaster POST
-# @auth.route("/roaster/login",methods = ["POST"])
-# def login_roaster():
-#     # Get username and password fron the request
-#     roaster_fields = roaster_schema.load(request.json)
-#     # Check username and password. User needs to exist, and password needs to match
-#     roaster = Roaster.query.filter_by(username=roaster_fields["username"]).first()
-#     if not roaster:
-#         return {"error": "This username is not valid"}
-    
-#     if not bcrypt.check_password_hash(roaster.password, roaster_fields["password"]):
-#         return {"error": "wrong password"}
-#     # Credentials are valid, so generate token and return it to the user
-
-#     token = create_access_token(identity="roaster", expires_delta=timedelta(days=1)) 
-
-#     return {"roaster": roaster.username, "token": token}
+    return {"username": roaster.username, "token": token}

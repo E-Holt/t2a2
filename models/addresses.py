@@ -8,4 +8,4 @@ class Address(db.Model):
     suburb = db.Column(db.String())
     city = db.Column(db.String())
     state = db.Column(db.String())
-    post_code = amount = db.Column(db.Integer)
+    post_code = db.Column(db.Integer)

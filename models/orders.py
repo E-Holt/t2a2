@@ -6,6 +6,6 @@ class Order(db.Model):
     order_date = db.Column(db.Date(), nullable=False)
     amount = db.Column(db.Integer, default = 250)
     grind = db.Column(db.String())
-    price = amount = db.Column(db.Integer)
+    price = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
     bean_id = db.Column(db.Integer, db.ForeignKey("beans.bean_id"), nullable=False)

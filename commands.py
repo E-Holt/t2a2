@@ -1,12 +1,12 @@
 from flask import Blueprint
 from main import db
 from main import bcrypt
-# from models.addresses import Address
-# from models.beans import Bean
-# from models.users import User
-# from models.roasters import Roaster
-# from models.orders import Order
-# from datetime import date
+from models.addresses import Address
+from models.beans import Bean
+from models.users import User
+from models.roasters import Roaster
+from models.orders import Order
+from datetime import date
 
 
 db_commands = Blueprint("db", __name__)
@@ -23,115 +23,76 @@ def drop_db():
     db.drop_all()
     print('Tables dropped')
 
-# @db_commands.cli.command('seed')
-# def seed_db():
-#     pass
+@db_commands.cli.command('seed')
+def seed_db():
 
-    # librarian1 = Librarian(
-    #     username = "sam",
-    #     password = bcrypt.generate_password_hash("12345678").decode("utf-8"),
-    #     name = "Sam the librarian"
-    # )
+    address1 = Address(
+        street_number = "123",
+        street_name = "Example street",
+        suburb = "Suburb",
+        city = "Brisbane",
+        state = "QLD",
+        post_code = "5555"
+    )
+    db.session.add(address1) 
+    db.session.commit()
 
-    # db.session.add(librarian1)  
-    
-    # user1 = User(
-    #     username = "jairo",
-    #     email = "jairo@email.com",
-    #     password = bcrypt.generate_password_hash("12345678").decode("utf-8")
-    # )
 
-    # db.session.add(user1)   
+    address2 = Address(
+        street_number = "123",
+        street_name = "Example2 street",
+        suburb = "Suburb",
+        city = "Brisbane",
+        state = "QLD",
+        post_code = "5555"
+    )
+    db.session.add(address2) 
+    db.session.commit()
 
-    # user2 = User(
-    #     username = "pang",
-    #     email = "pang@email.com",
-    #     password = bcrypt.generate_password_hash("12345678").decode("utf-8")
-    # )
+    roaster1 = Roaster(
+        username = "ToastyRoaster",
+        name = "Toasty Roastery",
+        password = bcrypt.generate_password_hash("12345678").decode("utf-8"),
+        email = "toasty@email.com",
+        address_id = address1.address_id
+    )
+    db.session.add(roaster1) 
+    db.session.commit()
 
-    # db.session.add(user2)  
-    # author1 = Author(
-    #     name = "Haruki Murakami",
-    #     country = "Japan",
-    #     dob = date(day = 12, month = 1,year = 1949 )
-    # )
+    bean1 = Bean(
+    country = "Panama",
+    variety = "Geisha",
+    flavour_notes = "Floral, citrus, rasin",
+    roast = "light",
+    recommended_preparation = "Pour over",
+    processing_method = "Black Winey natural",
+    roasters_id = roaster1.roaster_id
+    )
 
-    # db.session.add(author1)
+    db.session.add(bean1) 
+    db.session.commit()
 
-    # author2 = Author(
-    #     name = "Margaret Atwood",
-    #     country = "Canada",
-    #     dob = date(day = 18, month = 11,year = 1939 )
-    # )
 
-    # db.session.add(author2)
+    user1 = User(
+    user_name = "user1",
+    name = "Name Name",
+    password = bcrypt.generate_password_hash("12345678").decode("utf-8"),
+    email = "user1@email.com",
+    address_id = address2.address_id
+    )
 
-    # author3 = Author(
-    #     name = "Tom Clancy",
-    #     country = "USA",
-    #     dob = date(day = 12, month = 4,year = 1947 )
-    # )
+    db.session.add(user1) 
+    db.session.commit()
 
-    # db.session.add(author3)
-    # # We need the author_id for the book's foreign key.
-    # #We don't get id's until we commit to the database
-    # db.session.commit()
+    order1 = Order(
+        order_date = date(day = 22, month = 9, year = 2020),
+        amount = "250",
+        grind = "course",
+        price = "17",
+        user_id = user1.user_id, 
+        bean_id = bean1.bean_id
+    )
+    db.session.add(order1) 
+    db.session.commit()
 
-    # book1 = Book(
-    #     title = "1Q84",
-    #     genre = "Novel",
-    #     year = 2009,
-    #     length = 928,
-    #     #add the id explicitly
-    #     author_id = author1.author_id
-    # )
-    # db.session.add(book1)
-
-    # book2 = Book(
-    #     title = "Norwegian Wood",
-    #     genre = "Novel",
-    #     year = 1995,
-    #     length = 296,
-    #     #add the object, SQLAlchemy will handle it
-    #     author = author1
-    # )
-    # db.session.add(book2)
-
-    # book3 = Book(
-    #     title = "Alias Grace",
-    #     genre = "Fiction",
-    #     year = 1996,
-    #     length = 470,
-    #     author = author2
-    # )
-    # db.session.add(book3)
-
-    # book4 = Book(
-    #     title = "The Handmaid's Tale",
-    #     genre = "Science Fiction",
-    #     year = 1985,
-    #     length = 311,
-    #     author = author2
-    # )
-    # db.session.add(book4)
-
-    # book5 = Book(
-    #     title = "The Hand of the Red October",
-    #     genre = "Fiction",
-    #     year = 1984,
-    #     length = 387,
-    #     author = author3
-    # )
-    # db.session.add(book5)
-
-    # db.session.commit()
-
-    # reservation1 = Reservation(
-    #     start_date = date.today(),
-    #     book = book2,
-    #     user = user1
-    # )
-    # db.session.add(reservation1)
-    # db.session.commit()
-    
-    # print("tables seeded")
+    print('Tables seeded')

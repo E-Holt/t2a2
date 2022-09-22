@@ -3,6 +3,8 @@ from main import db
 from models.beans import Bean
 from models.orders import Order
 from models.users import User
+from models.roasters import Roaster
+from schemas.roaster_schema import roaster_schema
 from schemas.bean_schema import bean_schema, beans_schema
 from schemas.order_schema import order_schema, orders_schema
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -12,39 +14,39 @@ bean = Blueprint("bean", __name__, url_prefix="/bean")
 
 @bean.route("/", methods=["GET"])
 def get_bean():
-    # get all the books from the database
+    # get all the bean from the database
     bean_list = Bean.query.all()
     result = beans_schema.dump(bean_list)
     return jsonify(result)
 
-# @bean.route("/<int:id>", methods=["GET"])
-# def get_bean(id):
-#     # get the bean from the database by id
-#     bean = Bean.query.get(id)
-#     result = bean_schema.dump(bean)
-#     return jsonify(result)
+@bean.route("/<int:id>", methods=["GET"])
+def get_bean_id(id):
+    # get the bean from the database by id
+    bean = Bean.query.get(id)
+    result = bean_schema.dump(bean)
+    return jsonify(result)
 
-# @bean.route("/", methods=["POST"])
-# # a token is needed for this request
-# @jwt_required()
-# def new_bean():
-#     # it is not enough with a token, the identity needs to be a librarian
-#     if get_jwt_identity() != "roaster":
-#         return {"error": "You don't have the permission to do this"}
-#     bean_fields = bean_schema.load(request.json)
-#     bean = Bean(
-#         country = bean_fields["country"],
-#         variety = bean_fields["variety"],
-#         flavour_notes = bean_fields["flavour_notes"],
-#         roast = bean_fields["roast"],
-#         recommended_preparation = bean_fields["recommended_preparation"],
-#         processing_method = bean_fields["processing_method"],
-#         roaster_id = bean_fields["roaster"]
-#     )
+@bean.route("/add", methods=["POST"])
+# a token is needed for this request
+@jwt_required()
+def add_bean():
+    # it is not enough with a token, the identity needs to be a librarian
+    if get_jwt_identity() != "roaster":
+        return {"error": "You don't have the permission to do this"}, 401
+    bean_fields = bean_schema.load(request.json)
+    bean = Bean(
+        country = bean_fields["country"],
+        variety = bean_fields["variety"],
+        flavour_notes = bean_fields["flavour_notes"],
+        roast = bean_fields["roast"],
+        recommended_preparation = bean_fields["recommended_preparation"],
+        processing_method = bean_fields["processing_method"],
+        roaster_id = bean_fields["roaster"]
+    )
 
-#     db.session.add(bean)
-#     db.session.commit()
-#     return jsonify(bean_schema.dump(bean))
+    db.session.add(bean)
+    db.session.commit()
+    return jsonify(bean_schema.dump(bean))
 
 # @bean.route("/<int:id>", methods=["PUT"])
 # @jwt_required()

@@ -11,4 +11,4 @@ class Bean(db.Model):
     roast = db.Column(db.String())
     recommended_preparation = db.Column(db.String())
     processing_method = db.Column(db.String())
-    roasters_id = db.Column(db.Integer, db.ForeignKey("roasters.roaster_id"), nullable=False)
+    roaster_id = db.Column(db.Integer, db.ForeignKey("roasters.roaster_id"), nullable=False)
