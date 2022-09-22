@@ -1,12 +1,10 @@
 from datetime import timedelta
 from flask import Blueprint, jsonify, request
+from models.roasters import Roaster
 from main import db
 from main import bcrypt
 from main import jwt
 from flask_jwt_extended import create_access_token
-# from models.users import User
-# from schemas.user_schema import user_schema
-from models.roasters import Roaster
 from schemas.roaster_schema import roaster_schema
 
 roaster = Blueprint("roaster", __name__, url_prefix="/roaster")
@@ -42,23 +40,23 @@ def register_roaster():
 
     return {"username": roaster.username, "token": token}
 
-#Login a roaster that is already in the system
-@roaster.route("/login",methods = ["POST"])
-def login_roaster():
-    # Get username and password from the request
-    roaster_fields = roaster_schema.load(request.json)
-    # Check username and password. Roaster needs to exist, and password must match
-    roaster = Roaster.query.filter_by(username=roaster_fields["username"]).first()
-    if not roaster:
-        return {"error": "That username is not valid"}
+# #Login a roaster that is already in the system
+# @roaster.route("/login",methods = ["POST"])
+# def login_roaster():
+#     # Get username and password from the request
+#     roaster_fields = roaster_schema.load(request.json)
+#     # Check username and password. Roaster needs to exist, and password must match
+#     roaster = Roaster.query.filter_by(username=roaster_fields["username"]).first()
+#     if not roaster:
+#         return {"error": "That username is not valid"}
     
-    if not bcrypt.check_password_hash(roaster.password, roaster_fields["password"]):
-        return {"error": "wrong password"}
+#     if not bcrypt.check_password_hash(roaster.password, roaster_fields["password"]):
+#         return {"error": "wrong password"}
 
-    # Credentials are valid, so generate token and return it to the roster
-    token = create_access_token(identity=str(roaster.roaster_id), expires_delta=timedelta(days=1)) 
+#     # Credentials are valid, so generate token and return it to the roster
+#     token = create_access_token(identity=str(roaster.roaster_id), expires_delta=timedelta(days=1)) 
 
-    return {"username": roaster.username, "token": token}
+#     return {"username": roaster.username, "token": token}
 
 # #Login roaster POST
 # @auth.route("/roaster/login",methods = ["POST"])

@@ -1,12 +1,12 @@
 from flask import Blueprint
 from main import db
 from main import bcrypt
-from models.addresses import Address
-from models.beans import Bean
-from models.users import User
-from models.roasters import Roaster
-from models.orders import Order
-from datetime import date
+# from models.addresses import Address
+# from models.beans import Bean
+# from models.users import User
+# from models.roasters import Roaster
+# from models.orders import Order
+# from datetime import date
 
 
 db_commands = Blueprint("db", __name__)
@@ -23,9 +23,9 @@ def drop_db():
     db.drop_all()
     print('Tables dropped')
 
-@db_commands.cli.command('seed')
-def seed_db():
-    pass
+# @db_commands.cli.command('seed')
+# def seed_db():
+#     pass
 
     # librarian1 = Librarian(
     #     username = "sam",

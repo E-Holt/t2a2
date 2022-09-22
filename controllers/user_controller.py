@@ -41,20 +41,20 @@ def register_user():
 
     return {"username": user.username, "token": token}
 
-#Login user POST
-@user.route("/login",methods = ["POST"])
-def login_user():
-    # Get username and password fron the request
-    user_fields = user_schema.load(request.json)
-    # Check username and password. User needs to exist, and password needs to match
-    user = User.query.filter_by(username=user_fields["username"]).first()
-    if not user:
-        return {"error": "username is not valid"}
+# #Login user POST
+# @user.route("/login",methods = ["POST"])
+# def login_user():
+#     # Get username and password fron the request
+#     user_fields = user_schema.load(request.json)
+#     # Check username and password. User needs to exist, and password needs to match
+#     user = User.query.filter_by(username=user_fields["username"]).first()
+#     if not user:
+#         return {"error": "username is not valid"}
     
-    if not bcrypt.check_password_hash(user.password, user_fields["password"]):
-        return {"error": "wrong password"}
-    # Credentials are valid, so generate token and return it to the user
+#     if not bcrypt.check_password_hash(user.password, user_fields["password"]):
+#         return {"error": "wrong password"}
+#     # Credentials are valid, so generate token and return it to the user
 
-    token = create_access_token(identity=str(user.user_id), expires_delta=timedelta(days=1)) 
+#     token = create_access_token(identity=str(user.user_id), expires_delta=timedelta(days=1)) 
 
-    return {"username": user.username, "token": token}
+#     return {"username": user.username, "token": token}

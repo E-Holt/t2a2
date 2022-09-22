@@ -4,7 +4,9 @@ from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 
-# create the objects
+#db = online_library in postgres, admin = librarian password = 123456
+
+#create the objects
 db = SQLAlchemy()
 ma = Marshmallow()
 bcrypt = Bcrypt()
@@ -25,8 +27,8 @@ def create_app():
     from commands import db_commands
     app.register_blueprint(db_commands)
 
-    from controllers import registerable_controllers
-    for controller in registerable_controllers:
+    from controllers import Registerable_controllers
+    for controller in Registerable_controllers:
         app.register_blueprint(controller)
 
     return app
