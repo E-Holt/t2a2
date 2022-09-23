@@ -27,34 +27,34 @@ def drop_db():
 def seed_db():
 
     address1 = Address(
-        street_number = "123",
-        street_name = "Example street",
-        suburb = "Suburb",
-        city = "Brisbane",
-        state = "QLD",
-        post_code = "5555"
+    street_number = "123",
+    street_name = "Example street",
+    suburb = "Suburb",
+    city = "Brisbane",
+    state = "QLD",
+    post_code = "5555"
     )
     db.session.add(address1) 
     db.session.commit()
 
 
     address2 = Address(
-        street_number = "123",
-        street_name = "Example2 street",
-        suburb = "Suburb",
-        city = "Brisbane",
-        state = "QLD",
-        post_code = "5555"
+    street_number = "123",
+    street_name = "Example2 street",
+    suburb = "Suburb",
+    city = "Brisbane",
+    state = "QLD",
+    post_code = "5555"
     )
     db.session.add(address2) 
     db.session.commit()
 
     roaster1 = Roaster(
-        username = "ToastyRoaster",
-        name = "Toasty Roastery",
-        password = bcrypt.generate_password_hash("12345678").decode("utf-8"),
-        email = "toasty@email.com",
-        address_id = address1.address_id
+    username = "ToastyRoaster",
+    name = "Toasty Roastery",
+    password = bcrypt.generate_password_hash("12345678").decode("utf-8"),
+    email = "toasty@email.com",
+    address_id = address1.address_id
     )
     db.session.add(roaster1) 
     db.session.commit()
@@ -66,7 +66,7 @@ def seed_db():
     roast = "light",
     recommended_preparation = "Pour over",
     processing_method = "Black Winey natural",
-    roasters_id = roaster1.roaster_id
+    roaster_id = roaster1.roaster_id
     )
 
     db.session.add(bean1) 
@@ -74,7 +74,7 @@ def seed_db():
 
 
     user1 = User(
-    user_name = "user1",
+    username = "user1",
     name = "Name Name",
     password = bcrypt.generate_password_hash("12345678").decode("utf-8"),
     email = "user1@email.com",
@@ -85,12 +85,12 @@ def seed_db():
     db.session.commit()
 
     order1 = Order(
-        order_date = date(day = 22, month = 9, year = 2020),
-        amount = "250",
-        grind = "course",
-        price = "17",
-        user_id = user1.user_id, 
-        bean_id = bean1.bean_id
+    order_date = date(day = 22, month = 9, year = 2020),
+    amount = "250",
+    grind = "course",
+    price = "17",
+    user_id = user1.user_id, 
+    bean_id = bean1.bean_id
     )
     db.session.add(order1) 
     db.session.commit()
