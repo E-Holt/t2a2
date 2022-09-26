@@ -74,4 +74,4 @@ def delete_order(order_id):
     db.session.delete(order) 
     db.session.commit() 
 
-    return jsonify(orders_schema.dump(order))   
+    return jsonify(order_schema.dump(order))   
