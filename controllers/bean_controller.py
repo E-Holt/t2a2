@@ -79,43 +79,25 @@ def update_bean(id):
 
     return jsonify(bean_schema.dump(bean))   
 
-# # show all bean varieties
-# @bean.route("/", methods=["GET"])
-# @jwt_required()
-# def get_all_orders():
-#     # it is not enough with a token, the identity needs to be a roaster
-#     if get_jwt_identity() != "roaster":
-#         return {"error": "You don't have the permission to do this"}
-#     # get all the orders from the database
-#     reservations_list = Order.query.all()
-#     result = orders_schema.dump(order_list)
-#     return jsonify(result)
-        
-# post a new order
-@bean.route("/order/<int:id>", methods=["POST"])
+#allows roaster to delete beans no longer available
+@bean.route("/delete/<int:id>", methods=["DELETE"])
 @jwt_required()
-def new_order(id):
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
-    # it is not enough with a token, the identity needs to be a user
-    if not user:
+def delete_bean(id):
+    roaster_id = get_jwt_identity()
+    roaster = Roaster.query.get(roaster_id)
+    # it is not enough with a token, the identity needs to be a librarian
+    if not roaster:
         return {"error": "You don't have the permission to do this"}, 401
-    #find the book in the database
+    #find the bean in the database
     bean = Bean.query.get(id)
-    #check if book exist in the database
+    #check if bean exist in the database
     if not bean:
-        return {"error": "That bean variety isn't currently available"} 
-    order_fields = order_schema.load(request.json)
-    order = Order(
-        order_date = order_fields["order_date"],
-        amount = order_fields["amount"],
-        grind = order_fields["grind"],
-        price = order_fields["price"],
-        user_id = order_fields["user_id"],
-        bean_id = order_fields["bean_id"]
-    )
+        return {"error": "That bean variety is not found in the database"}, 200
+    #get the bean details from the request
+    bean_fields = bean_schema.load(request.json)
 
-    db.session.add(order)
-    db.session.commit()
+    #delete the bean in the database
+    db.session.delete(bean) 
+    db.session.commit() 
 
-    return jsonify(order_schema.dump(order))
+    return jsonify(bean_schema.dump(bean))   

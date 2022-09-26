@@ -54,3 +54,24 @@ def new_order(id):
     db.session.commit()
 
     return jsonify(order_schema.dump(order))
+
+#allows roaster to delete orders that have been fufilled
+@order.route("/delete/<int:order_id>", methods=["DELETE"])
+@jwt_required()
+def delete_order(order_id):
+    roaster_id = get_jwt_identity()
+    roaster = Roaster.query.get(roaster_id)
+    # must have roaster authorisation to do this
+    if not roaster:
+        return {"error": "You don't have the permission to do this"}, 401
+    #find the order in the database
+    order = Order.query.get(order_id)
+    #check if order exist in the database
+    if not order:
+        return {"error": "That order is not found in the database"}, 200
+
+    #delete the order in the database
+    db.session.delete(order) 
+    db.session.commit() 
+
+    return jsonify(orders_schema.dump(order))   

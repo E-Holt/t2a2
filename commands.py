@@ -27,7 +27,7 @@ def drop_db():
 def seed_db():
 
     address1 = Address(
-    street_number = "123",
+    street_number = "1",
     street_name = "Example street",
     suburb = "Suburb",
     city = "Brisbane",
@@ -39,8 +39,8 @@ def seed_db():
 
 
     address2 = Address(
-    street_number = "123",
-    street_name = "Example2 street",
+    street_number = "2",
+    street_name = "Example street",
     suburb = "Suburb",
     city = "Brisbane",
     state = "QLD",
@@ -49,14 +49,46 @@ def seed_db():
     db.session.add(address2) 
     db.session.commit()
 
+    address3 = Address(
+    street_number = "3",
+    street_name = "Example street",
+    suburb = "Suburb",
+    city = "Brisbane",
+    state = "QLD",
+    post_code = "5555"
+    )
+    db.session.add(address3) 
+    db.session.commit()
+
+    address4 = Address(
+    street_number = "4",
+    street_name = "Example street",
+    suburb = "Suburb",
+    city = "Brisbane",
+    state = "QLD",
+    post_code = "5555"
+    )
+    db.session.add(address4) 
+    db.session.commit()
+
     roaster1 = Roaster(
-    username = "ToastyRoaster",
-    name = "Toasty Roastery",
+    username = "ExampleRoaster1",
+    name = "Example Roastery 1",
     password = bcrypt.generate_password_hash("12345678").decode("utf-8"),
-    email = "toasty@email.com",
+    email = "roaster1@email.com",
     address_id = address1.address_id
     )
     db.session.add(roaster1) 
+    db.session.commit()
+
+    roaster2 = Roaster(
+    username = "ExampleRoaster2",
+    name = "Example Roastery 2",
+    password = bcrypt.generate_password_hash("12345678").decode("utf-8"),
+    email = "roaster2@email.com",
+    address_id = address2.address_id
+    )
+    db.session.add(roaster2) 
     db.session.commit()
 
     bean1 = Bean(
@@ -72,27 +104,61 @@ def seed_db():
     db.session.add(bean1) 
     db.session.commit()
 
+    bean2 = Bean(
+    country = "Indonesia",
+    variety = "Abyssinia",
+    flavour_notes = "berries, melon, spice, earthiness",
+    roast = "medium",
+    recommended_preparation = "Pour over",
+    processing_method = "natural",
+    roaster_id = roaster2.roaster_id
+    )
+
+    db.session.add(bean2) 
+    db.session.commit()
 
     user1 = User(
     username = "user1",
     name = "Name Name",
     password = bcrypt.generate_password_hash("12345678").decode("utf-8"),
     email = "user1@email.com",
-    address_id = address2.address_id
+    address_id = address3.address_id
     )
 
     db.session.add(user1) 
     db.session.commit()
 
+    user2 = User(
+    username = "user2",
+    name = "Name2 Name",
+    password = bcrypt.generate_password_hash("12345678").decode("utf-8"),
+    email = "user2@email.com",
+    address_id = address4.address_id
+    )
+
+    db.session.add(user2) 
+    db.session.commit()
+
     order1 = Order(
     order_date = date(day = 22, month = 9, year = 2020),
     amount = "250",
-    grind = "course",
+    grind = "coarse",
     price = "17",
     user_id = user1.user_id, 
     bean_id = bean1.bean_id
     )
     db.session.add(order1) 
+    db.session.commit()
+
+    order2 = Order(
+    order_date = date(day = 26, month = 9, year = 2020),
+    amount = "250",
+    grind = "fine",
+    price = "17",
+    user_id = user2.user_id, 
+    bean_id = bean2.bean_id
+    )
+    db.session.add(order2) 
     db.session.commit()
 
     print('Tables seeded')
