@@ -6,6 +6,7 @@ from main import bcrypt
 from main import jwt
 from flask_jwt_extended import create_access_token
 from schemas.roaster_schema import roaster_schema
+from marshmallow.exceptions import ValidationError
 
 roaster = Blueprint("roaster", __name__, url_prefix="/roaster")
 
@@ -17,12 +18,12 @@ def register_roaster():
     #find roaster by username to check if they are already in the database
     roaster = Roaster.query.filter_by(username=roaster_fields["username"]).first()
     if roaster:
-        return {"error": "Username already exists in the database"}
+        return {"error": "Username already exists in the database"}, 409
 
     #find roaster by email to check if they are already in the database
     roaster = Roaster.query.filter_by(email=roaster_fields["email"]).first()
     if roaster:
-        return {"error": "Email already exists in the database"}
+        return {"error": "Email already exists in the database"}, 409
     #create roaster Object
     roaster = Roaster(
         username = roaster_fields["username"],
@@ -38,7 +39,7 @@ def register_roaster():
     #generate the token setting the identity (roaster.id) and expiry time (1 day)
     token = create_access_token(identity=str(roaster.roaster_id), expires_delta=timedelta(days=1)) 
 
-    return {"username": roaster.username, "token": token}
+    return {"username": roaster.username, "token": token}, 200
 
 #Login a roaster that is already in the system
 @roaster.route("/login",methods = ["POST"])
@@ -48,7 +49,7 @@ def login_roaster():
     # Check username and password. Roaster needs to exist, and password must match
     roaster = Roaster.query.filter_by(username=roaster_fields["username"]).first()
     if not roaster:
-        return {"error": "That username is not valid"}
+        return {"error": "That username is not valid"}, 404
     
     if not bcrypt.check_password_hash(roaster.password, roaster_fields["password"]):
         return {"error": "wrong password"}
@@ -56,4 +57,8 @@ def login_roaster():
     # Credentials are valid, so generate token and return it to the roster
     token = create_access_token(identity=str(roaster.roaster_id), expires_delta=timedelta(days=1)) 
 
-    return {"username": roaster.username, "token": token}
+    return {"username": roaster.username, "token": token}, 200
+
+@roaster.errorhandler(ValidationError)
+def register_validation_error(error):
+    return error.messages, 400

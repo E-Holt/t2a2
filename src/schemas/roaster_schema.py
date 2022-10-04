@@ -1,5 +1,6 @@
 from wsgiref import validate
 from main import ma
+from marshmallow import fields
 from marshmallow.validate import Length
 
 class RoasterSchema(ma.Schema):

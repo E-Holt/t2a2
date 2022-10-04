@@ -117,6 +117,32 @@ def seed_db():
     db.session.add(bean2) 
     db.session.commit()
 
+    bean3 = Bean(
+    country = "Ethiopia",
+    variety = "JARC",
+    flavour_notes = "juicy, clean, pineapple, green grape",
+    roast = "medium",
+    recommended_preparation = "press",
+    processing_method = "anaerobic natural",
+    roaster_id = roaster1.roaster_id
+    )
+
+    db.session.add(bean3) 
+    db.session.commit()
+
+    bean4 = Bean(
+    country = "Kenya",
+    variety = "SL28",
+    flavour_notes = "sweet, syrupy, cherry, peach, orange",
+    roast = "medium",
+    recommended_preparation = "espresso",
+    processing_method = "washed",
+    roaster_id = roaster2.roaster_id
+    )
+
+    db.session.add(bean4) 
+    db.session.commit()
+
     user1 = User(
     username = "user1",
     name = "Name Name",

@@ -4,7 +4,7 @@ from marshmallow.validate import Length
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ("user_id", "username", "email", "password", "address_id")
+        fields = ("user_id", "username", "name", "email", "password", "address_id")
     #add validation to password
     password = ma.String(validate=Length(min=8))
 

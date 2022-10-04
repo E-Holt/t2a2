@@ -9,6 +9,7 @@ from schemas.order_schema import order_schema, orders_schema
 from schemas.roaster_schema import roaster_schema
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import date
+from marshmallow.exceptions import ValidationError
 
 bean = Blueprint("bean", __name__, url_prefix="/bean")
 
@@ -17,14 +18,36 @@ def get_bean():
     # get all the bean from the database
     bean_list = Bean.query.all()
     result = beans_schema.dump(bean_list)
-    return jsonify(result)
+    return jsonify(result), 200
+
+@bean.route("/search", methods=["GET"])
+def search_beans():
+    filtered_beans_list = []
+
+    if request.args.get("variety"):
+        filtered_beans_list = Bean.query.filter_by(variety = request.args.get("variety"))
+    elif request.args.get("country"):
+        filtered_beans_list = Bean.query.filter_by(country = request.args.get("country"))
+    elif request.args.get("flavour_notes"):
+        filtered_beans_list = Bean.query.filter_by(flavour_notes = request.args.get("flavour_notes"))
+    elif request.args.get("processing_method"):
+        filtered_beans_list = Bean.query.filter_by(processing_method = request.args.get("processing_method"))
+    elif request.args.get("recommended_preparation"):
+        filtered_beans_list = Bean.query.filter_by(recommended_preparation = request.args.get("recommended_preparation"))
+    elif request.args.get("roast"):
+        filtered_beans_list = Bean.query.filter_by(roast = request.args.get("roast"))
+    else:
+        return {"error": "No beans available based on that search criteria"}, 404
+    # # get all the beans from the database
+    result = beans_schema.dump(filtered_beans_list)
+    return jsonify(result), 200
 
 @bean.route("/<int:id>", methods=["GET"])
 def get_bean_id(id):
     # get the bean from the database by id
     bean = Bean.query.get(id)
     result = bean_schema.dump(bean)
-    return jsonify(result)
+    return jsonify(result), 200
 
 @bean.route("/add", methods=["POST"])
 # a token is needed for this request
@@ -62,7 +85,7 @@ def update_bean(id):
     bean = Bean.query.get(id)
     #check if bean exist in the database
     if not bean:
-        return {"error": "That bean variety is not found in the database"}
+        return {"error": "That bean variety is not found in the database"}, 404
     #get the bean details from the request
     bean_fields = bean_schema.load(request.json)
     #update the values of the bean
@@ -77,7 +100,7 @@ def update_bean(id):
     #save changes in the database
     db.session.commit() 
 
-    return jsonify(bean_schema.dump(bean))   
+    return jsonify(bean_schema.dump(bean)), 200   
 
 #allows roaster to delete beans no longer available
 @bean.route("/delete/<int:id>", methods=["DELETE"])
@@ -92,7 +115,7 @@ def delete_bean(id):
     bean = Bean.query.get(id)
     #check if bean exist in the database
     if not bean:
-        return {"error": "That bean variety is not found in the database"}, 200
+        return {"error": "That bean variety is not found in the database"}, 404
     #get the bean details from the request
     bean_fields = bean_schema.load(request.json)
 
@@ -100,4 +123,8 @@ def delete_bean(id):
     db.session.delete(bean) 
     db.session.commit() 
 
-    return jsonify(bean_schema.dump(bean))   
+    return jsonify(bean_schema.dump(bean)), 200   
+
+@bean.errorhandler(ValidationError)
+def register_validation_error(error):
+    return error.messages, 400

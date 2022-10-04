@@ -9,6 +9,7 @@ from schemas.order_schema import order_schema, orders_schema
 from schemas.roaster_schema import roaster_schema
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import date
+from marshmallow.exceptions import ValidationError
 
 order = Blueprint("order", __name__, url_prefix="/order")
 
@@ -24,7 +25,7 @@ def get_order():
     # get all the bean from the database
     order_list = Order.query.all()
     result = orders_schema.dump(order_list)
-    return jsonify(result)
+    return jsonify(result), 200
 
 # Post a new order
 @order.route("/<int:id>", methods=["POST"])
@@ -39,7 +40,7 @@ def new_order(id):
     bean = Bean.query.get(id)
     #check if book exist in the database
     if not bean:
-        return {"error": "That bean variety isn't currently available"} 
+        return {"error": "That bean variety isn't currently available"}, 404
     order_fields = order_schema.load(request.json)
     order = Order(
         order_date = order_fields["order_date"],
@@ -53,7 +54,7 @@ def new_order(id):
     db.session.add(order)
     db.session.commit()
 
-    return jsonify(order_schema.dump(order))
+    return jsonify(order_schema.dump(order)), 200
 
 #allows roaster to delete orders that have been fufilled
 @order.route("/delete/<int:order_id>", methods=["DELETE"])
@@ -68,10 +69,14 @@ def delete_order(order_id):
     order = Order.query.get(order_id)
     #check if order exist in the database
     if not order:
-        return {"error": "That order is not found in the database"}, 200
+        return {"error": "That order is not found in the database"}, 404
 
     #delete the order in the database
     db.session.delete(order) 
     db.session.commit() 
 
-    return jsonify(order_schema.dump(order))   
+    return jsonify(order_schema.dump(order)), 200   
+
+@order.errorhandler(ValidationError)
+def register_validation_error(error):
+    return error.messages, 400

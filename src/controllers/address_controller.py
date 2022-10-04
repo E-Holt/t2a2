@@ -7,6 +7,7 @@ from schemas.address_schema import address_schema, addresses_schema
 from schemas.user_schema import user_schema 
 from schemas.roaster_schema import roaster_schema
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from marshmallow.exceptions import ValidationError
 
 address = Blueprint("address", __name__, url_prefix="/address")
 
@@ -22,7 +23,7 @@ def get_address():
     # get all the addresses from the database
     address_list = Address.query.all()
     result = addresses_schema.dump(address_list)
-    return jsonify(result)
+    return jsonify(result), 200
 
 # Post a new address by users or roasters
 @address.route("/add", methods=["POST"])
@@ -41,5 +42,9 @@ def add_address():
     db.session.add(address)
     db.session.commit()
 
-    return jsonify(address_schema.dump(address))
+    return jsonify(address_schema.dump(address)), 200
+
+@address.errorhandler(ValidationError)
+def register_validation_error(error):
+    return error.messages, 400
 
