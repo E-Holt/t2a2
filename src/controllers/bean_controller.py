@@ -13,17 +13,20 @@ from marshmallow.exceptions import ValidationError
 
 bean = Blueprint("bean", __name__, url_prefix="/bean")
 
+# Shows all the current bean varieties in the database
 @bean.route("/", methods=["GET"])
 def get_bean():
-    # get all the bean from the database
+    # Gets and displays all the bean from the database
     bean_list = Bean.query.all()
     result = beans_schema.dump(bean_list)
     return jsonify(result), 200
 
+# Search function for different bean criteria, I attempted to make this more efficient but was unable to do so
 @bean.route("/search", methods=["GET"])
 def search_beans():
     filtered_beans_list = []
 
+    # Search for specific citeria
     if request.args.get("variety"):
         filtered_beans_list = Bean.query.filter_by(variety = request.args.get("variety"))
     elif request.args.get("country"):
@@ -36,28 +39,32 @@ def search_beans():
         filtered_beans_list = Bean.query.filter_by(recommended_preparation = request.args.get("recommended_preparation"))
     elif request.args.get("roast"):
         filtered_beans_list = Bean.query.filter_by(roast = request.args.get("roast"))
+    # Error if no bean varieties fit search criteria
     else:
         return {"error": "No beans available based on that search criteria"}, 404
-    # # get all the beans from the database
+    # Show all the beans from the database filtered by criteria
     result = beans_schema.dump(filtered_beans_list)
     return jsonify(result), 200
 
+# Search function for specific bean variety id 
 @bean.route("/<int:id>", methods=["GET"])
 def get_bean_id(id):
-    # get the bean from the database by id
+    # Get the bean from the database by id
     bean = Bean.query.get(id)
     result = bean_schema.dump(bean)
     return jsonify(result), 200
 
+# Add a new bean variety
 @bean.route("/add", methods=["POST"])
-# a token is needed for this request
 @jwt_required()
 def add_bean():
+    # Only roasters can add a new bean, must have roaster authorization token
     roaster_id = get_jwt_identity()
     roaster = Roaster.query.get(roaster_id)
-    # it is not enough with a token, the identity needs to be a librarian
+    # If not a roaster, error
     if not roaster:
         return {"error": "You don't have the permission to do this"}, 401
+    # Fields must be filled in to add new bean variety
     bean_fields = bean_schema.load(request.json)
     bean = Bean(
         country = bean_fields["country"],
@@ -68,27 +75,32 @@ def add_bean():
         processing_method = bean_fields["processing_method"],
         roaster_id = bean_fields["roaster_id"]
     )
-
+    # Add and commit new bean variety to the database
     db.session.add(bean)
     db.session.commit()
     return jsonify(bean_schema.dump(bean))
 
+# Update a bean variety
 @bean.route("/update/<int:id>", methods=["PUT"])
 @jwt_required()
 def update_bean(id):
+    # Only roasters can edit bean varieties. Must have roaster authorization token
     roaster_id = get_jwt_identity()
     roaster = Roaster.query.get(roaster_id)
-    # it is not enough with a token, the identity needs to be a librarian
+    # If not a roaster, error
     if not roaster:
         return {"error": "You don't have the permission to do this"}, 401
-    #find the bean in the database
+
+    # Find the specific bean in the database
     bean = Bean.query.get(id)
-    #check if bean exist in the database
+    # If that bean variety doesn't exist, error
     if not bean:
         return {"error": "That bean variety is not found in the database"}, 404
-    #get the bean details from the request
+
+    # Get the bean variety details from the request
     bean_fields = bean_schema.load(request.json)
-    #update the values of the bean
+
+    # Update the values of the bean fields
     bean.country = bean_fields["country"]
     bean.variety = bean_fields["variety"]
     bean.flavour_notes = bean_fields["flavour_notes"]
@@ -97,34 +109,37 @@ def update_bean(id):
     bean.processing_method = bean_fields["processing_method"]
     bean.roaster_id = bean_fields["roaster_id"]
 
-    #save changes in the database
+    # Save changes in the database
     db.session.commit() 
 
     return jsonify(bean_schema.dump(bean)), 200   
 
-#allows roaster to delete beans no longer available
+# Delete a bean variety that is no longer available
 @bean.route("/delete/<int:id>", methods=["DELETE"])
 @jwt_required()
 def delete_bean(id):
+    # Only roasters can delete bean varieties, must have roaster authorization token
     roaster_id = get_jwt_identity()
     roaster = Roaster.query.get(roaster_id)
-    # it is not enough with a token, the identity needs to be a librarian
+    # If not a roaster, error
     if not roaster:
         return {"error": "You don't have the permission to do this"}, 401
-    #find the bean in the database
+
+    # Find the specific bean in the database
     bean = Bean.query.get(id)
-    #check if bean exist in the database
+    # If the bean variety doesn't exist, error
     if not bean:
         return {"error": "That bean variety is not found in the database"}, 404
-    #get the bean details from the request
+    # Get the bean details from the request
     bean_fields = bean_schema.load(request.json)
 
-    #delete the bean in the database
+    # Delete the bean in the database
     db.session.delete(bean) 
     db.session.commit() 
 
     return jsonify(bean_schema.dump(bean)), 200   
 
+# Error handler if fields aren't correctly filled out
 @bean.errorhandler(ValidationError)
 def register_validation_error(error):
     return error.messages, 400

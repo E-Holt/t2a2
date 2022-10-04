@@ -11,6 +11,7 @@ from datetime import date
 
 db_commands = Blueprint("db", __name__)
 
+# Database commands for flask
 @db_commands.cli.command('create')
 def create_db():
     # Tell SQLAlchemy to create all tables for all models in the physical DB
@@ -23,6 +24,7 @@ def drop_db():
     db.drop_all()
     print('Tables dropped')
 
+# Added multiple items for each table to allow for testing 
 @db_commands.cli.command('seed')
 def seed_db():
 

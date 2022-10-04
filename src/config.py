@@ -2,11 +2,11 @@ import os
 
 class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    # access to .env and get the value of SECRET_KEY, the variable name can be any but needs to match
+    # Access to .env and get the value of SECRET_KEY
     JWT_SECRET_KEY =  os.environ.get("SECRET_KEY")
     @property
     def SQLALCHEMY_DATABASE_URI(self):
-        # access to .env and get the value of DATABASE_URL, the variable name can be any but needs to match
+        # Access to .env and get the value of DATABASE_URL
         value = os.environ.get("DATABASE_URL")
 
         if not value:
@@ -14,6 +14,7 @@ class Config(object):
 
         return value
 
+# This app is currently in development, allowing for debugging while running in Flask
 class DevelopmentConfig(Config):
     DEBUG = True
 

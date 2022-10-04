@@ -15,12 +15,14 @@ address = Blueprint("address", __name__, url_prefix="/address")
 @address.route("/", methods=["GET"])
 @jwt_required()
 def get_address():
+    # Must be a roaster to view addresses, must have roaster authorization token
     roaster_id = get_jwt_identity()
     roaster = Roaster.query.get(roaster_id)
-    # only roasters should be able to access all addresses
+    # If not a roaster, error
     if not roaster:
         return {"error": "You don't have the permission to do this"}, 401
-    # get all the addresses from the database
+
+    # Get all the addresses from the database
     address_list = Address.query.all()
     result = addresses_schema.dump(address_list)
     return jsonify(result), 200
@@ -29,6 +31,7 @@ def get_address():
 @address.route("/add", methods=["POST"])
 @jwt_required()
 def add_address():
+    # All address fields must be filled in
     address_fields = address_schema.load(request.json)
     address = Address(
         street_number = address_fields["street_number"],
@@ -38,12 +41,13 @@ def add_address():
         state = address_fields["state"],
         post_code = address_fields["post_code"]
     )
-
+    # Add and commit new address to database
     db.session.add(address)
     db.session.commit()
 
     return jsonify(address_schema.dump(address)), 200
 
+# Error handler if fields aren't correctly filled out
 @address.errorhandler(ValidationError)
 def register_validation_error(error):
     return error.messages, 400

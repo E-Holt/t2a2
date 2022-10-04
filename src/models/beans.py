@@ -12,3 +12,4 @@ class Bean(db.Model):
     recommended_preparation = db.Column(db.String())
     processing_method = db.Column(db.String())
     roaster_id = db.Column(db.Integer, db.ForeignKey("roasters.roaster_id"), nullable=False)
+    # Roaster id is a forign key
